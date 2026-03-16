@@ -44,19 +44,30 @@ function setPassword(username, newPass) {
 }
 
 function isLoggedIn() {
-  return sessionStorage.getItem('masjid_logged_in') === 'true';
+  return sessionStorage.getItem('masjid_logged_in') === 'true' ||
+    localStorage.getItem('masjid_remember_login') === 'true';
 }
 
 function getLoggedInUser() {
-  return sessionStorage.getItem('masjid_user') || 'Admin';
+  return sessionStorage.getItem('masjid_user') ||
+    localStorage.getItem('masjid_remember_user') || 'Admin';
 }
 
-function login(username, pass) {
+function login(username, pass, rememberMe) {
   const users = getUsers();
   const user = users.find(u => u.username === username && u.password === pass);
   if (user) {
     sessionStorage.setItem('masjid_logged_in', 'true');
     sessionStorage.setItem('masjid_user', user.username);
+    if (rememberMe) {
+      localStorage.setItem('masjid_remember_login', 'true');
+      localStorage.setItem('masjid_remember_user', user.username);
+      localStorage.setItem('masjid_remember_username', username);
+    } else {
+      localStorage.removeItem('masjid_remember_login');
+      localStorage.removeItem('masjid_remember_user');
+      localStorage.removeItem('masjid_remember_username');
+    }
     return true;
   }
   return false;
@@ -65,6 +76,9 @@ function login(username, pass) {
 function logout() {
   sessionStorage.removeItem('masjid_logged_in');
   sessionStorage.removeItem('masjid_user');
+  localStorage.removeItem('masjid_remember_login');
+  localStorage.removeItem('masjid_remember_user');
+  localStorage.removeItem('masjid_remember_username');
 }
 
 // ─── Info Masjid ──────────────────────────────────────────────────────────

@@ -10,6 +10,15 @@ let filterTahun = new Date().getFullYear();
 
 // ─── Init ─────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+    // Auto-fill username if previously remembered
+    const savedUser = localStorage.getItem('masjid_remember_username');
+    if (savedUser) {
+        const sel = document.getElementById('user-input');
+        if (sel) sel.value = savedUser;
+        const cb = document.getElementById('remember-me');
+        if (cb) cb.checked = true;
+    }
+
     if (!isLoggedIn()) {
         showLogin();
     } else {
@@ -54,7 +63,8 @@ function updateUserInfo() {
 function doLogin() {
     const username = document.getElementById('user-input').value;
     const pass = document.getElementById('pass-input').value;
-    if (login(username, pass)) {
+    const remember = document.getElementById('remember-me').checked;
+    if (login(username, pass, remember)) {
         showApp();
     } else {
         const err = document.getElementById('login-err');
