@@ -154,6 +154,13 @@ body {
 .summary-card.pemasukan { border-left-color: var(--hijau); }
 .summary-card.pengeluaran { border-left-color: var(--merah); }
 .summary-card.saldo { border-left-color: var(--emas); }
+.summary-card.tunai { border-left-color: #2563eb; }
+.summary-card.rekening { border-left-color: #7c3aed; }
+
+.summary-grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
 
 .summary-icon {
   width: 48px; height: 48px;

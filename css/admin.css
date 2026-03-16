@@ -383,6 +383,35 @@ nav.sidebar-nav {
     white-space: nowrap;
 }
 
+/* ─── Warna ikon kartu Tunai & Rekening ─────── */
+.tunai .summary-icon { background: #dbeafe; }
+.rekening .summary-icon { background: #ede9fe; }
+.tunai .nilai { color: #2563eb; }
+.rekening .nilai { color: #7c3aed; }
+
+/* ─── Tombol Download PDF ───────────────────── */
+.btn-pdf {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 18px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+    background: #dc2626;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(220,38,38,0.25);
+}
+
+.btn-pdf:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+}
+
 /* ─── Tabel Aksi ───────────────────────────── */
 .aksi-btn {
     display: inline-flex;

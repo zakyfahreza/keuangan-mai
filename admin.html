@@ -167,6 +167,24 @@
                         </div>
                     </div>
 
+                    <!-- Summary Metode Pembayaran -->
+                    <div class="summary-grid summary-grid-2" style="margin-top:12px">
+                        <div class="summary-card tunai">
+                            <div class="summary-icon">💵</div>
+                            <div class="summary-info">
+                                <label>Total Tunai</label>
+                                <div id="dash-tunai" class="nilai">Rp 0</div>
+                            </div>
+                        </div>
+                        <div class="summary-card rekening">
+                            <div class="summary-icon">🏦</div>
+                            <div class="summary-info">
+                                <label>Total Rekening</label>
+                                <div id="dash-rekening" class="nilai">Rp 0</div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Quick Actions Bawah Saldo -->
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:20px 0;">
                         <button class="btn btn-primary" onclick="showSection('transaksi')"
@@ -347,7 +365,7 @@
                     </div>
 
                     <!-- Mini summary riwayat -->
-                    <div class="summary-grid" style="margin-bottom:16px">
+                    <div class="summary-grid" style="margin-bottom:12px">
                         <div class="summary-card pemasukan">
                             <div class="summary-icon">📥</div>
                             <div class="summary-info"><label>Pemasukan</label>
@@ -368,10 +386,30 @@
                         </div>
                     </div>
 
+                    <!-- Summary Metode Riwayat -->
+                    <div class="summary-grid summary-grid-2" style="margin-bottom:16px">
+                        <div class="summary-card tunai">
+                            <div class="summary-icon">💵</div>
+                            <div class="summary-info"><label>Total Tunai</label>
+                                <div id="riwayat-tunai" class="nilai">Rp 0</div>
+                            </div>
+                        </div>
+                        <div class="summary-card rekening">
+                            <div class="summary-icon">🏦</div>
+                            <div class="summary-info"><label>Total Rekening</label>
+                                <div id="riwayat-rekening" class="nilai">Rp 0</div>
+                            </div>
+                        </div>
+                    </div>
+
+
                     <!-- Tabel riwayat -->
                     <div class="card">
                         <div class="card-header">
                             <div class="card-title"><span class="icon">📋</span> Daftar Transaksi</div>
+                            <button class="btn btn-pdf" onclick="downloadPDF()">
+                                📄 Download PDF
+                            </button>
                         </div>
                         <div class="table-wrap">
                             <table>
@@ -487,6 +525,10 @@
     <script src="https://www.gstatic.com/firebasejs/10.11.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore-compat.js"></script>
     <script src="js/firebase-config.js"></script>
+
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
     <script src="js/data.js"></script>
     <script src="js/admin.js"></script>
