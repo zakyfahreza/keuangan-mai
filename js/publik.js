@@ -7,34 +7,37 @@ let pubFilterBulan = new Date().getMonth();
 let pubFilterTahun = new Date().getFullYear();
 
 // ─── Init ─────────────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-    initPubFilter();
-    renderPubInfo();
-    renderPublik();
+document.addEventListener('DOMContentLoaded', async () => {
+    await initPubFilter();
+    await renderPubInfo();
+    await renderPublik();
     listenSync();
 });
 
 // ─── Sync real-time antar tab ─────────────────────────────────────────────
 function listenSync() {
-    window.addEventListener('storage', (e) => {
-        if (e.key === 'masjid_sync' || e.key === DB_KEY || e.key === INFO_KEY) {
-            renderPubInfo();
-            renderPublik();
-        }
+    // Listen for realtime updates on transactions
+    db.collection(DB_COLLECTION).onSnapshot(async () => {
+        await renderPublik();
+    });
+
+    // Listen for realtime updates on info
+    db.collection('info').doc('main').onSnapshot(async () => {
+        await renderPubInfo();
     });
 }
 
 // ─── Info Masjid ──────────────────────────────────────────────────────────
-function renderPubInfo() {
-    const info = getInfo();
+async function renderPubInfo() {
+    const info = await getInfo();
     document.getElementById('pub-nama').textContent = info.nama || 'Masjid Al-Ikhlas Adi Sucipto';
     document.getElementById('pub-alamat').textContent = info.alamat || '';
 }
 
 // ─── Filter ───────────────────────────────────────────────────────────────
-function initPubFilter() {
+async function initPubFilter() {
     const selTahun = document.getElementById('pub-filter-tahun');
-    const tahunList = getPeriodeOptions();
+    const tahunList = await getPeriodeOptions();
     selTahun.innerHTML = '';
     tahunList.forEach(t => {
         selTahun.innerHTML += `<option value="${t}" ${t == pubFilterTahun ? 'selected' : ''}>${t}</option>`;
@@ -43,11 +46,11 @@ function initPubFilter() {
     updatePeriodeLabel();
 }
 
-function onPubFilterChange() {
+async function onPubFilterChange() {
     pubFilterBulan = document.getElementById('pub-filter-bulan').value;
     pubFilterTahun = document.getElementById('pub-filter-tahun').value;
     updatePeriodeLabel();
-    renderPublik();
+    await renderPublik();
 }
 
 function updatePeriodeLabel() {
@@ -57,8 +60,8 @@ function updatePeriodeLabel() {
 }
 
 // ─── Render Utama ─────────────────────────────────────────────────────────
-function renderPublik() {
-    const list = getTransaksiByPeriode(pubFilterBulan, pubFilterTahun);
+async function renderPublik() {
+    const list = await getTransaksiByPeriode(pubFilterBulan, pubFilterTahun);
     const { pemasukan, pengeluaran, saldo } = kalkulasi(list);
 
     // Summary cards
@@ -84,14 +87,14 @@ function renderPublik() {
     }
 
     // Chart
-    renderPubChart();
+    await renderPubChart();
 
     // Statistik kategori
     renderKategoriBreakdown(list);
 }
 
 // ─── Bar Chart Publik ─────────────────────────────────────────────────────
-function renderPubChart() {
+async function renderPubChart() {
     const canvas = document.getElementById('pub-chart');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -101,7 +104,7 @@ function renderPubChart() {
     canvas.height = H;
     ctx.clearRect(0, 0, W, H);
 
-    const stats = getStatistikBulanan(parseInt(pubFilterTahun));
+    const stats = await getStatistikBulanan(parseInt(pubFilterTahun));
     const maxVal = Math.max(...stats.map(s => Math.max(s.pemasukan, s.pengeluaran)), 1);
     const slotW = (W - 24) / 12;
     const barW = Math.max(Math.floor(slotW / 2 - 4), 4);
@@ -187,7 +190,7 @@ function renderKategoriBreakdown(list) {
 }
 
 // ─── Ekspor PDF ────────────────────────────────────────────────────────────
-function exportPDF() {
+async function exportPDF() {
     const btnExport = document.getElementById('btn-pdf');
     btnExport.disabled = true;
     btnExport.innerHTML = '⏳ Menyiapkan PDF...';
@@ -195,8 +198,8 @@ function exportPDF() {
     try {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-        const info = getInfo();
-        const list = getTransaksiByPeriode(pubFilterBulan, pubFilterTahun);
+        const info = await getInfo();
+        const list = await getTransaksiByPeriode(pubFilterBulan, pubFilterTahun);
         const { pemasukan, pengeluaran, saldo } = kalkulasi(list);
         const bulanNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
         const periodeLabel = pubFilterBulan === 'all'

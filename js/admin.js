@@ -22,12 +22,12 @@ function showLogin() {
     document.getElementById('app-section').style.display = 'none';
 }
 
-function showApp() {
+async function showApp() {
     document.getElementById('login-section').style.display = 'none';
     document.getElementById('app-section').style.display = 'flex';
-    initFilter();
-    renderDashboard();
-    renderRiwayat();
+    await initFilter();
+    await renderDashboard();
+    await renderRiwayat();
     setPageTitle('Dashboard');
     updateUserInfo();
 }
@@ -70,7 +70,7 @@ document.addEventListener('keydown', (e) => {
 });
 
 // ─── Navigasi ─────────────────────────────────────────────────────────────
-function showSection(name) {
+async function showSection(name) {
     activeSection = name;
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
@@ -79,8 +79,8 @@ function showSection(name) {
     const titles = { dashboard: 'Dashboard', transaksi: 'Tambah Transaksi', riwayat: 'Riwayat Transaksi', pengaturan: 'Pengaturan' };
     setPageTitle(titles[name] || name);
     closeSidebar();
-    if (name === 'dashboard') renderDashboard();
-    if (name === 'riwayat') renderRiwayat();
+    if (name === 'dashboard') await renderDashboard();
+    if (name === 'riwayat') await renderRiwayat();
     if (name === 'pengaturan') loadPengaturan();
 }
 
@@ -126,9 +126,9 @@ function getFilterValues(prefix) {
 }
 
 // ─── Dashboard ─────────────────────────────────────────────────────────────
-function renderDashboard() {
+async function renderDashboard() {
     const { bulan, tahun } = getFilterValues('dash');
-    const list = getTransaksiByPeriode(bulan, tahun);
+    const list = await getTransaksiByPeriode(bulan, tahun);
     const { pemasukan, pengeluaran, saldo } = kalkulasi(list);
 
     document.getElementById('dash-pemasukan').textContent = formatRupiah(pemasukan);
@@ -152,15 +152,15 @@ function renderDashboard() {
     </tr>
   `).join('');
 
-    renderChart(parseInt(tahun));
+    await renderChart(parseInt(tahun));
 }
 
 // ─── Chart Sederhana ────────────────────────────────────────────────────────
-function renderChart(tahun) {
+async function renderChart(tahun) {
     const canvas = document.getElementById('chart-canvas');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    const stats = getStatistikBulanan(tahun);
+    const stats = await getStatistikBulanan(tahun);
     const W = canvas.offsetWidth || 700;
     const H = 200;
     canvas.width = W;
@@ -246,7 +246,7 @@ function resetForm() {
     removeBukti();
 }
 
-function submitTransaksi() {
+async function submitTransaksi() {
     const jenis = document.getElementById('input-jenis').value;
     const tanggal = document.getElementById('input-tanggal').value;
     const nominal = parseInt(document.getElementById('input-nominal').value.replace(/\D/g, ''));
@@ -262,16 +262,16 @@ function submitTransaksi() {
     const data = { jenis, tanggal, nominal, kategori, keterangan, bukti, user: getLoggedInUser() };
 
     if (editId) {
-        editTransaksi(editId, data);
+        await editTransaksi(editId, data);
         showToast('✅ Transaksi berhasil diperbarui!', 'success');
         editId = null;
     } else {
-        addTransaksi(data);
+        await addTransaksi(data);
         showToast('✅ Transaksi berhasil disimpan!', 'success');
     }
 
     resetForm();
-    showSection('riwayat');
+    await showSection('riwayat');
 }
 
 // Format nominal input dengan titik ribuan & upload file handler
@@ -317,9 +317,9 @@ function removeBukti() {
 }
 
 // ─── Riwayat Transaksi ─────────────────────────────────────────────────────
-function renderRiwayat() {
+async function renderRiwayat() {
     const { bulan, tahun } = getFilterValues('riwayat');
-    const list = getTransaksiByPeriode(bulan, tahun);
+    const list = await getTransaksiByPeriode(bulan, tahun);
     const { pemasukan, pengeluaran, saldo } = kalkulasi(list);
 
     document.getElementById('riwayat-pemasukan').textContent = formatRupiah(pemasukan);
@@ -351,13 +351,13 @@ function renderRiwayat() {
   `).join('');
 }
 
-function editTransaksiUI(id) {
-    const all = getAllTransaksi();
+async function editTransaksiUI(id) {
+    const all = await getAllTransaksi();
     const t = all.find(x => x.id === id);
     if (!t) return;
 
     editId = id;
-    showSection('transaksi');
+    await showSection('transaksi');
 
     document.getElementById('input-jenis').value = t.jenis;
     document.getElementById('input-tanggal').value = t.tanggal;
@@ -384,8 +384,8 @@ function editTransaksiUI(id) {
 // ─── Modal Konfirmasi Hapus & Bukti ─────────────────────────────────────────
 let hapusId = null;
 
-function lihatBukti(id) {
-    const all = getAllTransaksi();
+async function lihatBukti(id) {
+    const all = await getAllTransaksi();
     const t = all.find(x => x.id === id);
     if (t && t.bukti) {
         document.getElementById('modal-bukti-img').src = t.bukti;
@@ -398,12 +398,12 @@ function confirmHapus(id) {
     openModal('modal-hapus');
 }
 
-function doHapus() {
+async function doHapus() {
     if (hapusId) {
-        deleteTransaksi(hapusId);
+        await deleteTransaksi(hapusId);
         hapusId = null;
         closeModal('modal-hapus');
-        renderRiwayat();
+        await renderRiwayat();
         showToast('🗑 Transaksi berhasil dihapus', 'success');
     }
 }
@@ -417,15 +417,15 @@ function closeModal(id) {
 }
 
 // ─── Pengaturan ────────────────────────────────────────────────────────────
-function loadPengaturan() {
-    const info = getInfo();
+async function loadPengaturan() {
+    const info = await getInfo();
     document.getElementById('set-nama').value = info.nama || '';
     document.getElementById('set-alamat').value = info.alamat || '';
     document.getElementById('set-kontak').value = info.kontak || '';
 }
 
-function savePengaturan() {
-    setInfo({
+async function savePengaturan() {
+    await setInfo({
         nama: document.getElementById('set-nama').value.trim(),
         alamat: document.getElementById('set-alamat').value.trim(),
         kontak: document.getElementById('set-kontak').value.trim(),

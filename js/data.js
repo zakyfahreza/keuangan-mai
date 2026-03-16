@@ -3,12 +3,12 @@
  * Semua operasi CRUD dan kalkulasi keuangan
  */
 
-const DB_KEY = 'masjid_keuangan_transaksi';
+const DB_COLLECTION = 'transaksi';
 const INFO_KEY = 'masjid_info';
 const AUTH_KEY = 'masjid_auth';
 
 // ─── Inisialisasi Data Awal ────────────────────────────────────────────────
-function initData() {
+async function initData() {
   if (!localStorage.getItem(INFO_KEY)) {
     localStorage.setItem(INFO_KEY, JSON.stringify({
       nama: 'Masjid Al-Ikhlas Adi Sucipto',
@@ -18,23 +18,6 @@ function initData() {
   }
   if (!localStorage.getItem(AUTH_KEY)) {
     localStorage.setItem(AUTH_KEY, JSON.stringify({ users: DEFAULT_USERS }));
-  }
-  if (!localStorage.getItem(DB_KEY)) {
-    // Sample data
-    const now = new Date();
-    const bulanIni = now.getMonth();
-    const tahunIni = now.getFullYear();
-
-    const sampleData = [
-      { id: uuid(), jenis: 'pemasukan', tanggal: formatDate(new Date(tahunIni, bulanIni, 7)), nominal: 1250000, kategori: 'Infaq Jumat', keterangan: 'Infaq Jumat, 7 ' + getNamaBulan(bulanIni) + ' ' + tahunIni },
-      { id: uuid(), jenis: 'pemasukan', tanggal: formatDate(new Date(tahunIni, bulanIni, 14)), nominal: 975000, kategori: 'Infaq Jumat', keterangan: 'Infaq Jumat, 14 ' + getNamaBulan(bulanIni) + ' ' + tahunIni },
-      { id: uuid(), jenis: 'pemasukan', tanggal: formatDate(new Date(tahunIni, bulanIni, 10)), nominal: 500000, kategori: 'Donasi', keterangan: 'Donasi pembangunan masjid' },
-      { id: uuid(), jenis: 'pemasukan', tanggal: formatDate(new Date(tahunIni, bulanIni, 3)), nominal: 200000, kategori: 'Wakaf', keterangan: 'Wakaf Al-Quran' },
-      { id: uuid(), jenis: 'pengeluaran', tanggal: formatDate(new Date(tahunIni, bulanIni, 8)), nominal: 350000, kategori: 'Operasional', keterangan: 'Listrik & air bulan ini' },
-      { id: uuid(), jenis: 'pengeluaran', tanggal: formatDate(new Date(tahunIni, bulanIni, 12)), nominal: 150000, kategori: 'Operasional', keterangan: 'Beli sabun & peralatan kebersihan' },
-      { id: uuid(), jenis: 'pengeluaran', tanggal: formatDate(new Date(tahunIni, bulanIni, 15)), nominal: 250000, kategori: 'Sosial', keterangan: 'Bantuan warga dhuafa' },
-    ];
-    localStorage.setItem(DB_KEY, JSON.stringify(sampleData));
   }
 }
 
@@ -85,53 +68,53 @@ function logout() {
 }
 
 // ─── Info Masjid ──────────────────────────────────────────────────────────
-function getInfo() {
-  return JSON.parse(localStorage.getItem(INFO_KEY) || '{}');
+async function getInfo() {
+  const doc = await db.collection('info').doc('main').get();
+  if (doc.exists) return doc.data();
+  return {
+    nama: 'Masjid Al-Ikhlas Adi Sucipto',
+    alamat: 'Jl. Adi Sucipto, Surakarta',
+    kontak: ''
+  };
 }
 
-function setInfo(info) {
-  localStorage.setItem(INFO_KEY, JSON.stringify(info));
-  triggerSync();
+async function setInfo(info) {
+  await db.collection('info').doc('main').set(info);
 }
 
 // ─── CRUD Transaksi ───────────────────────────────────────────────────────
-function getAllTransaksi() {
-  return JSON.parse(localStorage.getItem(DB_KEY) || '[]');
+// ─── CRUD Transaksi ───────────────────────────────────────────────────────
+async function getAllTransaksi() {
+  const snapshot = await db.collection(DB_COLLECTION).get();
+  const list = [];
+  snapshot.forEach(doc => {
+    list.push({ id: doc.id, ...doc.data() });
+  });
+  return list;
 }
 
-function getTransaksiByPeriode(bulan, tahun) {
-  return getAllTransaksi().filter(t => {
+async function getTransaksiByPeriode(bulan, tahun) {
+  let list = await getAllTransaksi();
+  return list.filter(t => {
     const d = new Date(t.tanggal);
     if (bulan === 'all') return d.getFullYear() === parseInt(tahun);
     return d.getMonth() === parseInt(bulan) && d.getFullYear() === parseInt(tahun);
   }).sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
 }
 
-function addTransaksi(data) {
-  const list = getAllTransaksi();
-  const transaksi = { id: uuid(), ...data };
-  list.push(transaksi);
-  localStorage.setItem(DB_KEY, JSON.stringify(list));
-  triggerSync();
-  return transaksi;
+async function addTransaksi(data) {
+  // We use our uuid or let firestore generate, but let's just let firestore generate the ID
+  const docRef = await db.collection(DB_COLLECTION).add(data);
+  return { id: docRef.id, ...data };
 }
 
-function editTransaksi(id, data) {
-  const list = getAllTransaksi();
-  const idx = list.findIndex(t => t.id === id);
-  if (idx !== -1) {
-    list[idx] = { ...list[idx], ...data };
-    localStorage.setItem(DB_KEY, JSON.stringify(list));
-    triggerSync();
-    return true;
-  }
-  return false;
+async function editTransaksi(id, data) {
+  await db.collection(DB_COLLECTION).doc(id).update(data);
+  return true;
 }
 
-function deleteTransaksi(id) {
-  const list = getAllTransaksi().filter(t => t.id !== id);
-  localStorage.setItem(DB_KEY, JSON.stringify(list));
-  triggerSync();
+async function deleteTransaksi(id) {
+  await db.collection(DB_COLLECTION).doc(id).delete();
 }
 
 // ─── Kalkulasi ────────────────────────────────────────────────────────────
@@ -144,8 +127,9 @@ function kalkulasi(transaksiList) {
   return { pemasukan, pengeluaran, saldo: pemasukan - pengeluaran };
 }
 
-function getStatistikBulanan(tahun) {
-  const all = getAllTransaksi().filter(t => new Date(t.tanggal).getFullYear() === parseInt(tahun));
+async function getStatistikBulanan(tahun) {
+  const list = await getAllTransaksi();
+  const all = list.filter(t => new Date(t.tanggal).getFullYear() === parseInt(tahun));
   const stats = [];
   for (let m = 0; m < 12; m++) {
     const bulanData = all.filter(t => new Date(t.tanggal).getMonth() === m);
@@ -192,8 +176,8 @@ function getNamaBulanSingkat(m) {
   return b[m];
 }
 
-function getPeriodeOptions() {
-  const all = getAllTransaksi();
+async function getPeriodeOptions() {
+  const all = await getAllTransaksi();
   const tahunSet = new Set(all.map(t => new Date(t.tanggal).getFullYear()));
   const currentYear = new Date().getFullYear();
   tahunSet.add(currentYear);
