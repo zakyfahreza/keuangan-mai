@@ -17,12 +17,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ─── Sync real-time antar tab ─────────────────────────────────────────────
 function listenSync() {
     // Listen for realtime updates on transactions
-    db.collection(DB_COLLECTION).onSnapshot(async () => {
+    onTransaksiChanged(async () => {
         await renderPublik();
     });
 
     // Listen for realtime updates on info
-    db.collection('info').doc('main').onSnapshot(async () => {
+    onInfoChanged(async () => {
         await renderPubInfo();
     });
 }

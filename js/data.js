@@ -68,14 +68,31 @@ function logout() {
 }
 
 // ─── Info Masjid ──────────────────────────────────────────────────────────
+let cachedInfo = null;
+let infoListeners = [];
+
+db.collection('info').doc('main').onSnapshot(doc => {
+  if (doc.exists) {
+    cachedInfo = doc.data();
+  } else {
+    cachedInfo = {
+      nama: 'Masjid Al-Ikhlas Adi Sucipto',
+      alamat: 'Jl. Adi Sucipto, Surakarta',
+      kontak: ''
+    };
+  }
+  infoListeners.forEach(cb => cb(cachedInfo));
+});
+
 async function getInfo() {
-  const doc = await db.collection('info').doc('main').get();
-  if (doc.exists) return doc.data();
-  return {
-    nama: 'Masjid Al-Ikhlas Adi Sucipto',
-    alamat: 'Jl. Adi Sucipto, Surakarta',
-    kontak: ''
-  };
+  if (cachedInfo === null) {
+    await new Promise(r => {
+      const check = setInterval(() => {
+        if (cachedInfo !== null) { clearInterval(check); r(); }
+      }, 50);
+    });
+  }
+  return cachedInfo;
 }
 
 async function setInfo(info) {
@@ -84,21 +101,38 @@ async function setInfo(info) {
 
 // ─── CRUD Transaksi ───────────────────────────────────────────────────────
 // ─── CRUD Transaksi ───────────────────────────────────────────────────────
+let cachedTransaksi = null;
+let transaksiListeners = [];
+
+db.collection(DB_COLLECTION).onSnapshot(snapshot => {
+  const list = [];
+  snapshot.forEach(doc => {
+    list.push({ id: doc.id, ...doc.data() });
+  });
+  cachedTransaksi = list;
+  transaksiListeners.forEach(cb => cb(cachedTransaksi));
+}, error => {
+  console.error("Firebase Snapshot Error:", error);
+  if (typeof showToast !== 'undefined') showToast('Gagal memuat data!', 'error');
+});
+
+function onTransaksiChanged(cb) {
+  transaksiListeners.push(cb);
+}
+
+function onInfoChanged(cb) {
+  infoListeners.push(cb);
+}
+
 async function getAllTransaksi() {
-  try {
-    const snapshot = await db.collection(DB_COLLECTION).get();
-    const list = [];
-    snapshot.forEach(doc => {
-      list.push({ id: doc.id, ...doc.data() });
+  if (cachedTransaksi === null) {
+    await new Promise(r => {
+      const check = setInterval(() => {
+        if (cachedTransaksi !== null) { clearInterval(check); r(); }
+      }, 50);
     });
-    return list;
-  } catch (error) {
-    console.error("Error mengambil data dari Firebase:", error);
-    if (typeof showToast !== 'undefined') {
-      showToast('Gagal memuat data: ' + error.message, 'error');
-    }
-    return [];
   }
+  return cachedTransaksi;
 }
 
 async function getTransaksiByPeriode(bulan, tahun) {

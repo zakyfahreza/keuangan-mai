@@ -28,9 +28,11 @@ async function showApp() {
     await initFilter();
 
     // Auto-update tabel saat ada data masuk/berubah di server (Real-time listener)
-    db.collection(DB_COLLECTION).onSnapshot(async () => {
-        if (activeSection === 'dashboard') await renderDashboard();
-        if (activeSection === 'riwayat') await renderRiwayat();
+    onTransaksiChanged(async () => {
+        if (typeof activeSection !== 'undefined') {
+            if (activeSection === 'dashboard') await renderDashboard();
+            if (activeSection === 'riwayat') await renderRiwayat();
+        }
     });
 
     await renderDashboard();
