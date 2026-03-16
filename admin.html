@@ -134,12 +134,6 @@
                                 <select id="filter-tahun-dash" onchange="renderDashboard()"></select>
                             </div>
                         </div>
-                        <div style="display:flex; gap:10px;">
-                            <button class="btn btn-primary" onclick="showSection('transaksi')">➕ Tambah
-                                Transaksi</button>
-                            <button class="btn btn-secondary" onclick="showSection('riwayat')">📋 Riwayat
-                                Transaksi</button>
-                        </div>
                     </div>
 
                     <!-- Summary -->
@@ -165,6 +159,18 @@
                                 <div id="dash-saldo" class="nilai">Rp 0</div>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Quick Actions Bawah Saldo -->
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:24px 0;">
+                        <button class="btn btn-primary" onclick="showSection('transaksi')"
+                            style="padding:16px; font-size:16px; font-weight:600; box-shadow:0 4px 12px rgba(16,185,129,0.2);">
+                            ➕ Tambah Transaksi
+                        </button>
+                        <button class="btn btn-secondary" onclick="showSection('riwayat')"
+                            style="padding:16px; font-size:16px; font-weight:600; background:white; color:var(--teks); border:1px solid var(--abu-3);">
+                            📋 Riwayat Transaksi
+                        </button>
                     </div>
 
                     <!-- Chart -->
