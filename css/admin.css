@@ -1,0 +1,529 @@
+/* =============================================
+   ADMIN CSS - Laporan Keuangan Masjid
+   ============================================= */
+
+/* ─── Layout Admin ─────────────────────────── */
+body.admin-body {
+    background: var(--abu-2);
+}
+
+/* ─── Login Page ───────────────────────────── */
+.login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--hijau-tua) 0%, var(--hijau) 100%);
+    padding: 20px;
+}
+
+.login-box {
+    background: var(--putih);
+    border-radius: var(--radius-lg);
+    padding: 40px 36px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+}
+
+.login-box .masjid-icon {
+    font-size: 56px;
+    margin-bottom: 8px;
+}
+
+.login-box h2 {
+    font-family: 'Amiri', serif;
+    font-size: 20px;
+    color: var(--hijau-tua);
+    margin-bottom: 4px;
+}
+
+.login-box .sub-login {
+    font-size: 12px;
+    color: var(--abu-5);
+    margin-bottom: 28px;
+}
+
+.form-group {
+    margin-bottom: 16px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--teks-2);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid var(--abu-3);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    color: var(--teks);
+    background: var(--putih);
+    transition: var(--transition);
+}
+
+.form-group select {
+    cursor: pointer;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--hijau);
+    box-shadow: 0 0 0 3px rgba(45, 122, 79, 0.12);
+}
+
+.login-box .btn {
+    width: 100%;
+    justify-content: center;
+    margin-top: 8px;
+    padding: 11px;
+    font-size: 14px;
+}
+
+.login-err {
+    color: var(--merah);
+    font-size: 12px;
+    margin-top: 8px;
+    display: none;
+    background: var(--merah-muda);
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+}
+
+/* ─── Sidebar / Topbar ─────────────────────── */
+.admin-wrap {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 240px;
+    background: var(--hijau-tua);
+    color: var(--putih);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 100;
+    transition: transform 0.3s ease;
+}
+
+.sidebar-logo {
+    padding: 24px 20px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sidebar-logo .icon {
+    font-size: 28px;
+}
+
+.sidebar-logo h2 {
+    font-family: 'Amiri', serif;
+    font-size: 14px;
+    line-height: 1.3;
+}
+
+.sidebar-logo .sub {
+    font-size: 10px;
+    opacity: 0.65;
+}
+
+nav.sidebar-nav {
+    flex: 1;
+    padding: 16px 0;
+}
+
+.nav-section {
+    padding: 8px 16px 4px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    opacity: 0.5;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    color: rgba(255, 255, 255, 0.78);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    transition: var(--transition);
+    cursor: pointer;
+    border: none;
+    background: none;
+    width: 100%;
+    border-radius: 0;
+}
+
+.nav-link:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--putih);
+}
+
+.nav-link.active {
+    background: rgba(201, 153, 58, 0.25);
+    color: var(--emas-muda);
+    border-left: 3px solid var(--emas);
+}
+
+.nav-link .nav-icon {
+    font-size: 17px;
+}
+
+.sidebar-footer {
+    padding: 16px 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ─── Main Content ─────────────────────────── */
+.main-content {
+    margin-left: 240px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.topbar {
+    background: var(--putih);
+    border-bottom: 1px solid var(--abu-3);
+    padding: 14px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.topbar-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--teks);
+}
+
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--teks-2);
+}
+
+.user-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--hijau), var(--hijau-muda));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+}
+
+.page-content {
+    padding: 24px 28px;
+    flex: 1;
+}
+
+/* ─── Section Tabs ─────────────────────────── */
+.section {
+    display: none;
+}
+
+.section.active {
+    display: block;
+}
+
+/* ─── Form Transaksi ───────────────────────── */
+.form-card {
+    background: var(--putih);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+
+.form-card .form-body {
+    padding: 24px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.jenis-toggle {
+    display: flex;
+    gap: 0;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    border: 1.5px solid var(--abu-3);
+}
+
+.jenis-btn {
+    flex: 1;
+    padding: 9px;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    transition: var(--transition);
+    background: var(--putih);
+    color: var(--abu-5);
+}
+
+.jenis-btn:hover {
+    background: var(--abu-2);
+}
+
+.jenis-btn.active-masuk {
+    background: var(--hijau);
+    color: var(--putih);
+}
+
+.jenis-btn.active-keluar {
+    background: var(--merah);
+    color: var(--putih);
+}
+
+/* ─── Tabel Aksi ───────────────────────────── */
+.aksi-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.aksi-edit {
+    background: var(--biru-muda);
+    color: var(--biru);
+}
+
+.aksi-hapus {
+    background: var(--merah-muda);
+    color: var(--merah);
+}
+
+.aksi-btn:hover {
+    filter: brightness(0.92);
+}
+
+/* ─── Modal ────────────────────────────────── */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.22s ease;
+}
+
+.modal-overlay.open {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.modal {
+    background: var(--putih);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 520px;
+    box-shadow: var(--shadow-lg);
+    transform: scale(0.96) translateY(8px);
+    transition: transform 0.22s ease;
+}
+
+.modal-overlay.open .modal {
+    transform: scale(1) translateY(0);
+}
+
+.modal-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--abu-3);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.modal-header h3 {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.modal-close {
+    width: 30px;
+    height: 30px;
+    border: none;
+    background: var(--abu-2);
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+}
+
+.modal-close:hover {
+    background: var(--abu-3);
+}
+
+.modal-body {
+    padding: 24px;
+}
+
+.modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--abu-3);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* ─── Responsive Admin ─────────────────────── */
+.hamburger {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    color: var(--teks);
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%);
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    .main-content {
+        margin-left: 0;
+    }
+
+    .hamburger {
+        display: flex;
+        align-items: center;
+    }
+
+    .page-content {
+        padding: 16px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .topbar {
+        padding: 12px 16px;
+    }
+
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .filter-bar {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    /* Memperbesar tombol aksi cepat di dashboard saat mobile */
+    .card-header>div[style*="gap:10px"] {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 10px !important;
+    }
+
+    .card-header>div[style*="gap:10px"] .btn {
+        width: 100%;
+        justify-content: center;
+        padding: 14px;
+        font-size: 15px;
+    }
+
+    .table-wrap {
+        padding-bottom: 8px;
+        /* Allow slight scroll margin */
+    }
+
+    .modal {
+        width: 100%;
+        margin: 10px;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+}
+
+/* ─── Overlay sidebar di mobile ────────────── */
+.sidebar-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 99;
+}
+
+.sidebar-backdrop.open {
+    display: block;
+}

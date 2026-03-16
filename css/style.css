@@ -1,0 +1,386 @@
+/* ============================================================
+   STYLE UMUM - Laporan Keuangan Masjid Al-Ikhlas Adi Sucipto
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Amiri:wght@400;700&display=swap');
+
+/* ─── Variabel ─────────────────────────────────────────────── */
+:root {
+  --hijau-tua: #1a4731;
+  --hijau: #2d7a4f;
+  --hijau-muda: #3ca068;
+  --hijau-terang: #e8f5ee;
+  --emas: #c9993a;
+  --emas-muda: #f7e9c6;
+  --emas-terang: #fdf6e3;
+  --putih: #ffffff;
+  --abu-1: #f8fafc;
+  --abu-2: #f1f5f9;
+  --abu-3: #e2e8f0;
+  --abu-4: #94a3b8;
+  --abu-5: #64748b;
+  --teks: #1e293b;
+  --teks-2: #475569;
+  --merah: #dc2626;
+  --merah-muda: #fee2e2;
+  --biru: #2563eb;
+  --biru-muda: #dbeafe;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-lg: 16px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.1), 0 8px 32px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.12), 0 16px 48px rgba(0,0,0,0.1);
+  --transition: all 0.2s ease;
+}
+
+/* ─── Reset & Base ─────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--abu-1);
+  color: var(--teks);
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ─── Ornamen Header ───────────────────────────────────────── */
+.header-masjid {
+  background: linear-gradient(135deg, var(--hijau-tua) 0%, var(--hijau) 60%, var(--hijau-muda) 100%);
+  color: var(--putih);
+  padding: 24px 32px;
+  position: relative;
+  overflow: hidden;
+}
+
+.header-masjid::before {
+  content: '';
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+}
+
+.header-masjid::after {
+  content: '';
+  position: absolute;
+  bottom: -80px; left: 40%;
+  width: 260px; height: 260px;
+  border-radius: 50%;
+  background: rgba(201,153,58,0.12);
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: relative;
+  z-index: 1;
+  flex-wrap: wrap;
+}
+
+.header-icon {
+  font-size: 40px;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
+}
+
+.header-text h1 {
+  font-family: 'Amiri', serif;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+
+.header-text .sub {
+  font-size: 12px;
+  opacity: 0.82;
+  font-weight: 400;
+  margin-top: 2px;
+}
+
+.header-badge {
+  margin-left: auto;
+  background: rgba(201,153,58,0.25);
+  border: 1px solid rgba(201,153,58,0.5);
+  color: var(--emas-muda);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.live-dot {
+  width: 7px; height: 7px;
+  background: #4ade80;
+  border-radius: 50%;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.3); }
+}
+
+/* ─── Kartu Ringkasan ──────────────────────────────────────── */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin: 24px 0;
+}
+
+.summary-card {
+  background: var(--putih);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: var(--transition);
+  border-left: 4px solid transparent;
+}
+
+.summary-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+
+.summary-card.pemasukan { border-left-color: var(--hijau); }
+.summary-card.pengeluaran { border-left-color: var(--merah); }
+.summary-card.saldo { border-left-color: var(--emas); }
+
+.summary-icon {
+  width: 48px; height: 48px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.pemasukan .summary-icon { background: var(--hijau-terang); }
+.pengeluaran .summary-icon { background: var(--merah-muda); }
+.saldo .summary-icon { background: var(--emas-muda); }
+
+.summary-info label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--abu-5);
+}
+
+.summary-info .nilai {
+  font-size: 20px;
+  font-weight: 700;
+  margin-top: 4px;
+  line-height: 1.2;
+}
+
+.pemasukan .nilai { color: var(--hijau); }
+.pengeluaran .nilai { color: var(--merah); }
+.saldo .nilai { color: var(--emas); }
+
+/* ─── Tabel ────────────────────────────────────────────────── */
+.card {
+  background: var(--putih);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.card-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--abu-3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--teks);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-title .icon { font-size: 18px; }
+
+.table-wrap { overflow-x: auto; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+thead th {
+  background: var(--abu-2);
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--abu-5);
+  white-space: nowrap;
+}
+
+tbody td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--abu-3);
+  vertical-align: middle;
+}
+
+tbody tr:last-child td { border-bottom: none; }
+
+tbody tr:hover td { background: var(--abu-1); }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.badge-pemasukan { background: var(--hijau-terang); color: var(--hijau); }
+.badge-pengeluaran { background: var(--merah-muda); color: var(--merah); }
+
+.td-nominal { font-weight: 600; white-space: nowrap; }
+.td-nominal.pemasukan { color: var(--hijau); }
+.td-nominal.pengeluaran { color: var(--merah); }
+
+/* ─── Tombol ───────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 18px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition);
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.btn:hover { filter: brightness(1.07); transform: translateY(-1px); }
+.btn:active { transform: translateY(0); filter: brightness(0.97); }
+
+.btn-primary { background: var(--hijau); color: var(--putih); }
+.btn-emas { background: var(--emas); color: var(--putih); }
+.btn-danger { background: var(--merah); color: var(--putih); }
+.btn-secondary { background: var(--abu-2); color: var(--teks-2); border: 1px solid var(--abu-3); }
+.btn-sm { padding: 5px 12px; font-size: 12px; }
+
+/* ─── Filter Bar ───────────────────────────────────────────── */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.filter-bar select, .filter-bar input {
+  padding: 7px 12px;
+  border: 1px solid var(--abu-3);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  background: var(--putih);
+  color: var(--teks);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.filter-bar select:focus, .filter-bar input:focus {
+  outline: none;
+  border-color: var(--hijau);
+  box-shadow: 0 0 0 3px rgba(45,122,79,0.12);
+}
+
+/* ─── Empty State ──────────────────────────────────────────── */
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--abu-4);
+}
+
+.empty-state .es-icon { font-size: 48px; margin-bottom: 12px; }
+.empty-state p { font-size: 14px; }
+
+/* ─── Toast Notifikasi ─────────────────────────────────────── */
+#toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toast-item {
+  background: var(--teks);
+  color: var(--putih);
+  padding: 12px 20px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: var(--shadow-md);
+  animation: slideIn 0.3s ease forwards;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 220px;
+}
+
+.toast-item.success { background: var(--hijau); }
+.toast-item.error   { background: var(--merah); }
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(60px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideOut {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(60px); }
+}
+
+/* ─── Responsive ───────────────────────────────────────────── */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 20px;
+}
+
+@media (max-width: 640px) {
+  .header-masjid { padding: 18px 20px; }
+  .header-text h1 { font-size: 17px; }
+  .summary-grid { grid-template-columns: 1fr; }
+  .container { padding: 16px 12px; }
+  .card-header { padding: 12px 16px; }
+  .summary-card { padding: 16px; }
+}
+
+/* ─── Scrollbar custom ─────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--abu-2); }
+::-webkit-scrollbar-thumb { background: var(--abu-3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--abu-4); }

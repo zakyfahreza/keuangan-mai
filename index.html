@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan Keuangan — Masjid Al-Ikhlas Adi Sucipto</title>
+    <meta name="description"
+        content="Laporan keuangan masjid yang transparan dan dapat diakses oleh seluruh jamaah Masjid Al-Ikhlas Adi Sucipto.">
+    <link rel="icon" href="images/logo_masjid.png">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/publik.css">
+    <!-- jsPDF & AutoTable for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+</head>
+
+<body>
+
+    <!-- ══════════════════════════════════════════════
+     HEADER PUBLIK
+════════════════════════════════════════════════ -->
+    <header class="publik-header">
+        <img src="images/logo_masjid.png" alt="Logo Masjid Al-Ikhlas" class="masjid-logo"
+            style="width:120px; height:auto; margin-bottom:10px; position:relative; z-index:1;">
+        <div class="ornamen">✦ ✦ ✦</div>
+        <h1 id="pub-nama">Masjid Al-Ikhlas Adi Sucipto</h1>
+        <p id="pub-alamat" class="alamat">Jl. Adi Sucipto, Surakarta</p>
+        <div style="margin-top:14px; position:relative; z-index:1">
+            <div
+                style="display:inline-block; background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.25); border-radius:8px; padding:8px 20px; font-size:13px; font-weight:600;">
+                📊 Laporan Keuangan Masjid
+            </div>
+        </div>
+    </header>
+
+    <!-- Laporan info bar -->
+    <div class="laporan-info">
+        <div class="laporan-periode" id="pub-periode-label">📅 Laporan Bulan Ini</div>
+        <div style="display:flex; align-items:center; gap:8px">
+            <div class="publik-live-badge">
+                <div class="live-dot"></div>
+                LIVE
+            </div>
+            <span id="pub-jumlah-transaksi" style="font-size:12px; color:var(--abu-5)">0 transaksi</span>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+     KONTEN UTAMA
+════════════════════════════════════════════════ -->
+    <div class="container">
+
+        <!-- Action Bar: Filter + PDF -->
+        <div class="action-bar">
+            <div class="filter-bar">
+                <select id="pub-filter-bulan" onchange="onPubFilterChange()">
+                    <option value="0">Januari</option>
+                    <option value="1">Februari</option>
+                    <option value="2">Maret</option>
+                    <option value="3">April</option>
+                    <option value="4">Mei</option>
+                    <option value="5">Juni</option>
+                    <option value="6">Juli</option>
+                    <option value="7">Agustus</option>
+                    <option value="8">September</option>
+                    <option value="9">Oktober</option>
+                    <option value="10">November</option>
+                    <option value="11">Desember</option>
+                    <option value="all">Semua Bulan</option>
+                </select>
+                <select id="pub-filter-tahun" onchange="onPubFilterChange()"></select>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center">
+                <a href="admin.html" style="text-decoration:none">
+                    <button class="btn btn-secondary">🔐 Admin</button>
+                </a>
+                <button id="btn-pdf" class="btn btn-pdf" onclick="exportPDF()">📄 Ekspor PDF</button>
+            </div>
+        </div>
+
+        <!-- Saldo Highlight -->
+        <div class="saldo-highlight">
+            <span class="icon">💰</span>
+            <div>
+                <div class="label">Saldo Kas Masjid (Periode Ini)</div>
+                <div id="pub-saldo" class="nilai">Rp 0</div>
+            </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="summary-grid">
+            <div class="summary-card pemasukan">
+                <div class="summary-icon">📥</div>
+                <div class="summary-info">
+                    <label>Total Pemasukan</label>
+                    <div id="pub-pemasukan" class="nilai">Rp 0</div>
+                </div>
+            </div>
+            <div class="summary-card pengeluaran">
+                <div class="summary-icon">📤</div>
+                <div class="summary-info">
+                    <label>Total Pengeluaran</label>
+                    <div id="pub-pengeluaran" class="nilai">Rp 0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart Bulanan -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title"><span class="icon">📊</span> Grafik Keuangan Bulanan</div>
+                <div class="chart-legend" style="margin:0">
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background:var(--hijau)"></div> Pemasukan
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background:var(--merah)"></div> Pengeluaran
+                    </div>
+                </div>
+            </div>
+            <div class="chart-wrap">
+                <canvas id="pub-chart" style="width:100%; min-width:300px; display:block"></canvas>
+            </div>
+        </div>
+
+        <!-- Statistik per Kategori -->
+        <div class="kategori-grid">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title" style="color:var(--hijau)"><span class="icon">⬆</span> Pemasukan per
+                        Kategori</div>
+                </div>
+                <div id="kat-pemasukan-list" class="kat-list"></div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title" style="color:var(--merah)"><span class="icon">⬇</span> Pengeluaran per
+                        Kategori</div>
+                </div>
+                <div id="kat-pengeluaran-list" class="kat-list"></div>
+            </div>
+        </div>
+
+        <!-- Tabel Transaksi -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title"><span class="icon">📋</span> Rincian Transaksi</div>
+                <span style="font-size:12px; color:var(--abu-4)">Diperbarui secara otomatis</span>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tanggal</th>
+                            <th>Jenis</th>
+                            <th>Kategori</th>
+                            <th>Nominal</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pub-tbody">
+                        <tr>
+                            <td colspan="4">
+                                <div class="empty-state">
+                                    <div class="es-icon">⏳</div>
+                                    <p>Memuat data...</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ══════════════════ SEKSI DONASI ══════════════════ -->
+        <div class="donasi-section">
+            <div class="donasi-header">
+                <span class="icon">🤲</span>
+                <div>
+                    <h2>Donasi &amp; Infaq Kegiatan Masjid</h2>
+                    <div class="sub">Salurkan donasi Anda untuk kegiatan &amp; pembangunan Masjid Al-Ikhlas</div>
+                </div>
+            </div>
+
+            <div class="donasi-body">
+                <!-- Kolom kiri: info transfer -->
+                <div class="donasi-transfer">
+                    <div class="bank-name">
+                        <div class="bank-logo">BSI</div>
+                        <div>
+                            <div class="bank-label">Transfer via</div>
+                            <div class="bank-fullname">Bank Syariah Indonesia (BSI)</div>
+                        </div>
+                    </div>
+
+                    <div class="rekening-box">
+                        <div class="rek-label">Nomor Rekening</div>
+                        <div class="rek-value" id="nomor-rek">7313-9221-24</div>
+                        <div class="rek-an">👤 a.n. Kemuslimahan Masjid Al-Ikhlas Jajar</div>
+                    </div>
+
+                    <button class="copy-btn" onclick="copyRekening()" id="copy-rek-btn">
+                        📋 Salin Nomor Rekening
+                    </button>
+
+                    <div class="donasi-note">
+                        <span>ℹ️</span>
+                        <span>Setelah transfer, mohon konfirmasi ke pengurus masjid agar dapat dicatat sebagai amal
+                            jariyah Anda. Jazākumullāhu khairan atas kepercayaan dan dukungan Anda.</span>
+                    </div>
+                </div>
+
+                <!-- Kolom kanan: QRIS -->
+                <div class="donasi-qris">
+                    <div class="qris-label">📱 Scan QRIS</div>
+                    <img src="images/qris.png" alt="QRIS Kemuslimahan Al-Ikhlas — NMID: ID1025412676039"
+                        onerror="this.style.display='none'; document.getElementById('qris-err').style.display='flex'">
+                    <div id="qris-err"
+                        style="display:none; width:160px; height:160px; background:rgba(255,255,255,0.1); border:2px dashed rgba(255,255,255,0.3); border-radius:12px; align-items:center; justify-content:center; text-align:center; color:rgba(255,255,255,0.6); font-size:11px; padding:16px">
+                        Gambar QRIS tidak tersedia
+                    </div>
+                    <div class="qris-note">
+                        Bayar dengan semua aplikasi<br>e-wallet &amp; bank yang mendukung QRIS
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /container -->
+
+
+    <!-- ══════════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════════ -->
+    <footer class="publik-footer">
+        <p>🕌 <strong>Masjid Al-Ikhlas Adi Sucipto</strong> — Laporan Keuangan Transparan untuk Jamaah</p>
+        <p style="margin-top:4px">Semoga Allah Subhanahu wa Ta'ala membalas setiap amal jariyah dengan kebaikan yang
+            berlipat ganda. 🤲
+        </p>
+    </footer>
+
+    <div id="toast"></div>
+
+    <script src="js/data.js"></script>
+    <script src="js/publik.js"></script>
+</body>
+
+</html>
