@@ -9,8 +9,10 @@ let filterBulan = new Date().getMonth();
 let filterTahun = new Date().getFullYear();
 
 // ─── Init ─────────────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-    // Auto-fill username if previously remembered
+let listenerRegistered = false;
+
+document.addEventListener('DOMContentLoaded', async () => {
+    // Auto-fill username/akses if previously remembered
     const savedUser = localStorage.getItem('masjid_remember_username');
     if (savedUser) {
         const sel = document.getElementById('user-input');
@@ -22,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!isLoggedIn()) {
         showLogin();
     } else {
-        showApp();
+        await showApp();
     }
 });
 
@@ -36,13 +38,16 @@ async function showApp() {
     document.getElementById('app-section').style.display = 'flex';
     await initFilter();
 
-    // Auto-update tabel saat ada data masuk/berubah di server (Real-time listener)
-    onTransaksiChanged(async () => {
-        if (typeof activeSection !== 'undefined') {
-            if (activeSection === 'dashboard') await renderDashboard();
-            if (activeSection === 'riwayat') await renderRiwayat();
-        }
-    });
+    // Register listener once only
+    if (!listenerRegistered) {
+        listenerRegistered = true;
+        onTransaksiChanged(async () => {
+            if (typeof activeSection !== 'undefined') {
+                if (activeSection === 'dashboard') await renderDashboard();
+                if (activeSection === 'riwayat') await renderRiwayat();
+            }
+        });
+    }
 
     await renderDashboard();
     await renderRiwayat();
