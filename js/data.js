@@ -85,12 +85,20 @@ async function setInfo(info) {
 // ─── CRUD Transaksi ───────────────────────────────────────────────────────
 // ─── CRUD Transaksi ───────────────────────────────────────────────────────
 async function getAllTransaksi() {
-  const snapshot = await db.collection(DB_COLLECTION).get();
-  const list = [];
-  snapshot.forEach(doc => {
-    list.push({ id: doc.id, ...doc.data() });
-  });
-  return list;
+  try {
+    const snapshot = await db.collection(DB_COLLECTION).get();
+    const list = [];
+    snapshot.forEach(doc => {
+      list.push({ id: doc.id, ...doc.data() });
+    });
+    return list;
+  } catch (error) {
+    console.error("Error mengambil data dari Firebase:", error);
+    if (typeof showToast !== 'undefined') {
+      showToast('Gagal memuat data: ' + error.message, 'error');
+    }
+    return [];
+  }
 }
 
 async function getTransaksiByPeriode(bulan, tahun) {
@@ -141,7 +149,7 @@ async function getStatistikBulanan(tahun) {
 
 // ─── Sync antar Tab ──────────────────────────────────────────────────────
 function triggerSync() {
-  localStorage.setItem('masjid_sync', Date.now().toString());
+  // Not needed for Firestore
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────

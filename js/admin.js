@@ -26,6 +26,13 @@ async function showApp() {
     document.getElementById('login-section').style.display = 'none';
     document.getElementById('app-section').style.display = 'flex';
     await initFilter();
+
+    // Auto-update tabel saat ada data masuk/berubah di server (Real-time listener)
+    db.collection(DB_COLLECTION).onSnapshot(async () => {
+        if (activeSection === 'dashboard') await renderDashboard();
+        if (activeSection === 'riwayat') await renderRiwayat();
+    });
+
     await renderDashboard();
     await renderRiwayat();
     setPageTitle('Dashboard');
