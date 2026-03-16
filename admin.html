@@ -278,11 +278,10 @@
                                 <!-- Metode Pembayaran -->
                                 <div class="form-group">
                                     <label>Metode Pembayaran</label>
-                                    <div class="metode-toggle">
-                                        <button type="button" id="btn-metode-cash" class="metode-btn active-cash" onclick="setMetode('cash')">💵 Cash</button>
-                                        <button type="button" id="btn-metode-rekening" class="metode-btn" onclick="setMetode('rekening')">🏦 Transfer Rekening</button>
-                                    </div>
-                                    <input type="hidden" id="input-metode" value="cash">
+                                    <select id="input-metode">
+                                        <option value="tunai">💵 Tunai</option>
+                                        <option value="rekening">🏦 Transfer Rekening</option>
+                                    </select>
                                 </div>
 
                                 <!-- Keterangan -->

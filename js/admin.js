@@ -187,7 +187,7 @@ async function renderDashboard() {
           <td><span class="badge badge-${t.jenis}">${t.jenis === 'pemasukan' ? '⬆ Pemasukan' : '⬇ Pengeluaran'}</span></td>
           <td>${t.kategori}</td>
           <td>${formatRupiah(t.nominal)}</td>
-          <td><span class="badge badge-metode-${t.metode || 'cash'}">${t.metode === 'rekening' ? '🏦 Rekening' : '💵 Cash'}</span></td>
+          <td><span class="badge badge-metode-${t.metode || 'tunai'}">${t.metode === 'rekening' ? '🏦 Rekening' : '💵 Tunai'}</span></td>
           <td>${t.keterangan || '-'}<br><small style="color:var(--abu-4); display:block; margin-top:4px;">👤 ${t.user || 'Sistem'}</small></td>
         </tr>
       `).join('');
@@ -266,17 +266,6 @@ function setJenis(jenis) {
     renderKategoriOptions(jenis);
 }
 
-function setMetode(metode) {
-    const btnCash = document.getElementById('btn-metode-cash');
-    const btnRek  = document.getElementById('btn-metode-rekening');
-    const input   = document.getElementById('input-metode');
-    input.value   = metode;
-    btnCash.className = 'metode-btn';
-    btnRek.className  = 'metode-btn';
-    if (metode === 'cash') btnCash.classList.add('active-cash');
-    else btnRek.classList.add('active-rekening');
-}
-
 const KATEGORI = {
     pemasukan: ['Infaq Jumat', 'Donasi', 'Zakat', 'Wakaf', 'Lainnya'],
     pengeluaran: ['Operasional', 'Pembangunan', 'Sosial', 'Mukafaah', 'Insentif Imam/Muadzin', 'Lainnya']
@@ -291,10 +280,9 @@ function resetForm() {
     editId = null;
     document.getElementById('form-transaksi').reset();
     document.getElementById('input-jenis').value = 'pemasukan';
-    document.getElementById('input-metode').value = 'cash';
+    document.getElementById('input-metode').value = 'tunai';
     document.getElementById('input-tanggal').value = new Date().toISOString().split('T')[0];
     setJenis('pemasukan');
-    setMetode('cash');
     document.getElementById('form-title').textContent = '➕ Tambah Transaksi';
     document.getElementById('btn-simpan').textContent = 'Simpan Transaksi';
     removeBukti();
@@ -419,7 +407,10 @@ async function editTransaksiUI(id) {
     document.getElementById('input-tanggal').value = t.tanggal;
     document.getElementById('input-nominal').value = t.nominal.toLocaleString('id-ID');
     setJenis(t.jenis);
-    setMetode(t.metode || 'cash');
+    setTimeout(() => {
+        const sel = document.getElementById('input-metode');
+        if (sel) sel.value = t.metode || 'tunai';
+    }, 10);
     // Tunggu render kategori selesai lalu set nilai
     setTimeout(() => {
         document.getElementById('input-kategori').value = t.kategori;
