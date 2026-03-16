@@ -72,9 +72,6 @@
                 <select id="pub-filter-tahun" onchange="onPubFilterChange()"></select>
             </div>
             <div style="display:flex; gap:10px; align-items:center">
-                <a href="images/qris.jpg" download="QRIS_Masjid_Al_Ikhlas.jpg" style="text-decoration:none">
-                    <button class="btn" style="background-color: var(--biru); color: white;">💳 Download QRIS</button>
-                </a>
                 <a href="admin.html" style="text-decoration:none">
                     <button class="btn btn-secondary">🔐 Admin</button>
                 </a>
@@ -225,6 +222,15 @@
                     <div class="qris-note">
                         Bayar dengan semua aplikasi<br>e-wallet &amp; bank yang mendukung QRIS
                     </div>
+
+                    <!-- Tombol Download QRIS dipindah ke sini -->
+                    <a href="images/qris.jpg" download="QRIS_Masjid_Al_Ikhlas.jpg"
+                        style="text-decoration:none; display:inline-block; margin-top:12px;">
+                        <button class="btn"
+                            style="background-color: var(--biru); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500;">
+                            💳 Download QRIS
+                        </button>
+                    </a>
                 </div>
             </div>
         </div>
