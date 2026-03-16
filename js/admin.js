@@ -179,13 +179,15 @@ async function renderDashboard() {
     const tbl = document.getElementById('dash-recent-tbody');
     const recent = list.slice(0, 5);
     if (recent.length === 0) {
-        tbl.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="es-icon">📋</div><p>Belum ada transaksi periode ini</p></div></td></tr>`;
+        tbl.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="es-icon">📋</div><p>Belum ada transaksi periode ini</p></div></td></tr>`;
     } else {
         tbl.innerHTML = recent.map(t => `
         <tr>
           <td>${formatTanggal(t.tanggal)}</td>
           <td><span class="badge badge-${t.jenis}">${t.jenis === 'pemasukan' ? '⬆ Pemasukan' : '⬇ Pengeluaran'}</span></td>
           <td>${t.kategori}</td>
+          <td>${formatRupiah(t.nominal)}</td>
+          <td><span class="badge badge-metode-${t.metode || 'cash'}">${t.metode === 'rekening' ? '🏦 Rekening' : '💵 Cash'}</span></td>
           <td>${t.keterangan || '-'}<br><small style="color:var(--abu-4); display:block; margin-top:4px;">👤 ${t.user || 'Sistem'}</small></td>
         </tr>
       `).join('');
@@ -264,6 +266,17 @@ function setJenis(jenis) {
     renderKategoriOptions(jenis);
 }
 
+function setMetode(metode) {
+    const btnCash = document.getElementById('btn-metode-cash');
+    const btnRek  = document.getElementById('btn-metode-rekening');
+    const input   = document.getElementById('input-metode');
+    input.value   = metode;
+    btnCash.className = 'metode-btn';
+    btnRek.className  = 'metode-btn';
+    if (metode === 'cash') btnCash.classList.add('active-cash');
+    else btnRek.classList.add('active-rekening');
+}
+
 const KATEGORI = {
     pemasukan: ['Infaq Jumat', 'Donasi', 'Zakat', 'Wakaf', 'Lainnya'],
     pengeluaran: ['Operasional', 'Pembangunan', 'Sosial', 'Mukafaah', 'Insentif Imam/Muadzin', 'Lainnya']
@@ -278,8 +291,10 @@ function resetForm() {
     editId = null;
     document.getElementById('form-transaksi').reset();
     document.getElementById('input-jenis').value = 'pemasukan';
+    document.getElementById('input-metode').value = 'cash';
     document.getElementById('input-tanggal').value = new Date().toISOString().split('T')[0];
     setJenis('pemasukan');
+    setMetode('cash');
     document.getElementById('form-title').textContent = '➕ Tambah Transaksi';
     document.getElementById('btn-simpan').textContent = 'Simpan Transaksi';
     removeBukti();
@@ -291,6 +306,7 @@ async function submitTransaksi() {
     const nominal = parseInt(document.getElementById('input-nominal').value.replace(/\D/g, ''));
     const kategori = document.getElementById('input-kategori').value;
     const keterangan = document.getElementById('input-keterangan').value.trim();
+    const metode = document.getElementById('input-metode').value;
 
     if (!tanggal || !nominal || nominal <= 0) {
         showToast('Tanggal dan nominal wajib diisi!', 'error');
@@ -298,7 +314,7 @@ async function submitTransaksi() {
     }
 
     const bukti = document.getElementById('input-bukti-base64').value;
-    const data = { jenis, tanggal, nominal, kategori, keterangan, bukti, user: getLoggedInUser() };
+    const data = { jenis, tanggal, nominal, kategori, keterangan, bukti, metode, user: getLoggedInUser() };
 
     if (editId) {
         await editTransaksi(editId, data);
@@ -377,6 +393,7 @@ async function renderRiwayat() {
       <td><span class="badge badge-${t.jenis}">${t.jenis === 'pemasukan' ? '⬆ Pemasukan' : '⬇ Pengeluaran'}</span></td>
       <td>${t.kategori}</td>
       <td class="td-nominal ${t.jenis}">${t.jenis === 'pemasukan' ? '+' : '-'} ${formatRupiah(t.nominal)}</td>
+      <td><span class="badge badge-metode-${t.metode || 'cash'}">${t.metode === 'rekening' ? '🏦 Rekening' : '💵 Cash'}</span></td>
       <td>
         ${t.keterangan || '-'}
         ${t.bukti ? `<br><button class="btn btn-secondary btn-sm" onclick="lihatBukti('${t.id}')" style="margin-top:6px; padding:4px 8px; font-size:11px; background:var(--abu-1); color:var(--abu-5);">📄 Lihat Bukti</button>` : ''}
@@ -402,6 +419,7 @@ async function editTransaksiUI(id) {
     document.getElementById('input-tanggal').value = t.tanggal;
     document.getElementById('input-nominal').value = t.nominal.toLocaleString('id-ID');
     setJenis(t.jenis);
+    setMetode(t.metode || 'cash');
     // Tunggu render kategori selesai lalu set nilai
     setTimeout(() => {
         document.getElementById('input-kategori').value = t.kategori;

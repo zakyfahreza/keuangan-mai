@@ -214,6 +214,7 @@
                                         <th>Jenis</th>
                                         <th>Kategori</th>
                                         <th>Nominal</th>
+                                        <th>Metode</th>
                                         <th>Keterangan</th>
                                     </tr>
                                 </thead>
@@ -272,6 +273,16 @@
                                 <div class="form-group">
                                     <label>Kategori</label>
                                     <select id="input-kategori"></select>
+                                </div>
+
+                                <!-- Metode Pembayaran -->
+                                <div class="form-group">
+                                    <label>Metode Pembayaran</label>
+                                    <div class="metode-toggle">
+                                        <button type="button" id="btn-metode-cash" class="metode-btn active-cash" onclick="setMetode('cash')">💵 Cash</button>
+                                        <button type="button" id="btn-metode-rekening" class="metode-btn" onclick="setMetode('rekening')">🏦 Transfer Rekening</button>
+                                    </div>
+                                    <input type="hidden" id="input-metode" value="cash">
                                 </div>
 
                                 <!-- Keterangan -->
@@ -371,6 +382,7 @@
                                         <th>Jenis</th>
                                         <th>Kategori</th>
                                         <th>Nominal</th>
+                                        <th>Metode</th>
                                         <th>Keterangan</th>
                                         <th>Aksi</th>
                                     </tr>

@@ -326,6 +326,63 @@ nav.sidebar-nav {
     color: var(--putih);
 }
 
+/* ─── Metode Pembayaran Toggle ─────────────── */
+.metode-toggle {
+    display: flex;
+    gap: 0;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    border: 1.5px solid var(--abu-3);
+}
+
+.metode-btn {
+    flex: 1;
+    padding: 9px;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    transition: var(--transition);
+    background: var(--putih);
+    color: var(--abu-5);
+}
+
+.metode-btn:hover {
+    background: var(--abu-2);
+}
+
+.metode-btn.active-cash {
+    background: #2563eb;
+    color: var(--putih);
+}
+
+.metode-btn.active-rekening {
+    background: #7c3aed;
+    color: var(--putih);
+}
+
+/* ─── Badge Metode (tabel admin) ────────────── */
+.badge-metode-cash {
+    background: #dbeafe;
+    color: #1d4ed8;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.badge-metode-rekening {
+    background: #ede9fe;
+    color: #6d28d9;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
 /* ─── Tabel Aksi ───────────────────────────── */
 .aksi-btn {
     display: inline-flex;
