@@ -371,7 +371,7 @@ async function renderRiwayat() {
 
     const tbody = document.getElementById('riwayat-tbody');
     if (list.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="es-icon">📋</div><p>Belum ada transaksi pada periode ini</p></div></td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="es-icon">📋</div><p>Belum ada transaksi pada periode ini</p></div></td></tr>`;
         return;
     }
 
@@ -381,7 +381,7 @@ async function renderRiwayat() {
       <td><span class="badge badge-${t.jenis}">${t.jenis === 'pemasukan' ? '⬆ Pemasukan' : '⬇ Pengeluaran'}</span></td>
       <td>${t.kategori}</td>
       <td class="td-nominal ${t.jenis}">${t.jenis === 'pemasukan' ? '+' : '-'} ${formatRupiah(t.nominal)}</td>
-      <td><span class="badge badge-metode-${t.metode || 'cash'}">${t.metode === 'rekening' ? '🏦 Rekening' : '💵 Cash'}</span></td>
+      <td><span class="badge badge-metode-${t.metode || 'tunai'}">${t.metode === 'rekening' ? '🏦 Rekening' : '💵 Tunai'}</span></td>
       <td>
         ${t.keterangan || '-'}
         ${t.bukti ? `<br><button class="btn btn-secondary btn-sm" onclick="lihatBukti('${t.id}')" style="margin-top:6px; padding:4px 8px; font-size:11px; background:var(--abu-1); color:var(--abu-5);">📄 Lihat Bukti</button>` : ''}
