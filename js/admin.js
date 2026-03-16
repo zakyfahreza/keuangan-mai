@@ -168,8 +168,15 @@ function getFilterValues(prefix) {
 function kalkulasiMetode(list) {
     let tunai = 0, rekening = 0;
     list.forEach(t => {
-        if (t.metode === 'rekening') rekening += t.nominal;
-        else tunai += t.nominal;
+        const nom = Number(t.nominal) || 0;
+        const isMasuk = t.jenis === 'pemasukan';
+        const val = isMasuk ? nom : -nom;
+        
+        if (t.metode === 'rekening') {
+            rekening += val;
+        } else {
+            tunai += val;
+        }
     });
     return { tunai, rekening };
 }
@@ -385,8 +392,8 @@ async function renderRiwayat() {
     document.getElementById('riwayat-pemasukan').textContent = formatRupiah(pemasukan);
     document.getElementById('riwayat-pengeluaran').textContent = formatRupiah(pengeluaran);
     document.getElementById('riwayat-saldo').textContent = formatRupiah(saldo);
-    document.getElementById('riwayat-tunai').textContent = formatRupiah(tunai);
-    document.getElementById('riwayat-rekening').textContent = formatRupiah(rekening);
+    document.getElementById('riwayat-tunai').textContent = formatRupiah(Math.abs(tunai));
+    document.getElementById('riwayat-rekening').textContent = formatRupiah(Math.abs(rekening));
 
 
     const tbody = document.getElementById('riwayat-tbody');
@@ -401,7 +408,7 @@ async function renderRiwayat() {
       <td><span class="badge badge-${t.jenis}">${t.jenis === 'pemasukan' ? '⬆ Pemasukan' : '⬇ Pengeluaran'}</span></td>
       <td>${t.kategori}</td>
       <td class="td-nominal ${t.jenis}">${t.jenis === 'pemasukan' ? '+' : '-'} ${formatRupiah(t.nominal)}</td>
-      <td><span class="badge badge-metode-${t.metode || 'tunai'}">${t.metode === 'rekening' ? '🏦 Rekening' : '💵 Tunai'}</span></td>
+      <td><span class="badge badge-metode-${t.metode === 'rekening' ? 'rekening' : 'tunai'}">${t.metode === 'rekening' ? '🏦 Rekening' : '💵 Tunai'}</span></td>
       <td>
         ${t.keterangan || '-'}
         ${t.bukti ? `<br><button class="btn btn-secondary btn-sm" onclick="lihatBukti('${t.id}')" style="margin-top:6px; padding:4px 8px; font-size:11px; background:var(--abu-1); color:var(--abu-5);">📄 Lihat Bukti</button>` : ''}
@@ -550,110 +557,115 @@ window.addEventListener('load', () => {
 
 // ─── Download PDF ──────────────────────────────────────────────────────────
 async function downloadPDF() {
-    if (!lastRiwayatList || lastRiwayatList.length === 0) {
-        showToast('Tidak ada data transaksi untuk diunduh!', 'error');
-        return;
-    }
+    try {
+        if (!lastRiwayatList || lastRiwayatList.length === 0) {
+            showToast('Tidak ada data transaksi untuk diunduh!', 'error');
+            return;
+        }
 
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+        const doc = new window.jspdf.jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
 
-    // Info masjid
-    const info = await getInfo();
-    const namaMasjid = info.nama || 'Masjid Al-Ikhlas Adi Sucipto';
-    const alamat = info.alamat || '';
+        // Info masjid
+        const info = await getInfo();
+        const namaMasjid = info.nama || 'Masjid Al-Ikhlas Adi Sucipto';
+        const alamat = info.alamat || '';
 
-    // Periode
-    const bulanEl = document.getElementById('filter-bulan-riwayat');
-    const tahunEl = document.getElementById('filter-tahun-riwayat');
-    const namaBulanArr = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-    const bulanVal = bulanEl ? bulanEl.value : 'all';
-    const tahunVal = tahunEl ? tahunEl.value : new Date().getFullYear();
-    const periodeTeks = bulanVal === 'all'
-        ? `Tahun ${tahunVal}`
-        : `${namaBulanArr[parseInt(bulanVal)]} ${tahunVal}`;
+        // Periode
+        const bulanEl = document.getElementById('filter-bulan-riwayat');
+        const tahunEl = document.getElementById('filter-tahun-riwayat');
+        const namaBulanArr = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+        const bulanVal = bulanEl ? bulanEl.value : 'all';
+        const tahunVal = tahunEl ? tahunEl.value : new Date().getFullYear();
+        const periodeTeks = bulanVal === 'all'
+            ? `Tahun ${tahunVal}`
+            : `${namaBulanArr[parseInt(bulanVal)]} ${tahunVal}`;
 
-    // Header
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(14);
-    doc.text(namaMasjid, 148, 14, { align: 'center' });
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(9);
-    doc.text(alamat, 148, 20, { align: 'center' });
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'bold');
-    doc.text(`LAPORAN KEUANGAN — ${periodeTeks.toUpperCase()}`, 148, 27, { align: 'center' });
-    doc.setDrawColor(45, 122, 79);
-    doc.setLineWidth(0.7);
-    doc.line(14, 30, 283, 30);
-
-    // Ringkasan
-    const list = lastRiwayatList;
-    const { pemasukan, pengeluaran, saldo } = kalkulasi(list);
-    const { tunai, rekening } = kalkulasiMetode(list);
-
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'normal');
-    const ringkasan = [
-        ['Total Pemasukan', formatRupiah(pemasukan)],
-        ['Total Pengeluaran', formatRupiah(pengeluaran)],
-        ['Saldo Bersih', formatRupiah(saldo)],
-        ['Total Tunai', formatRupiah(tunai)],
-        ['Total Transfer Rekening', formatRupiah(rekening)],
-    ];
-    let rx = 14, ry = 35;
-    ringkasan.forEach(([label, nilai]) => {
+        // Header
         doc.setFont('helvetica', 'bold');
-        doc.text(label + ':', rx, ry);
+        doc.setFontSize(14);
+        doc.text(namaMasjid, 148, 14, { align: 'center' });
         doc.setFont('helvetica', 'normal');
-        doc.text(nilai, rx + 52, ry);
-        rx += 55;
-    });
+        doc.setFontSize(9);
+        doc.text(alamat, 148, 20, { align: 'center' });
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
+        doc.text(`LAPORAN KEUANGAN — ${periodeTeks.toUpperCase()}`, 148, 27, { align: 'center' });
+        doc.setDrawColor(45, 122, 79);
+        doc.setLineWidth(0.7);
+        doc.line(14, 30, 283, 30);
 
-    // Tabel transaksi
-    const rows = list.map((t, i) => [
-        i + 1,
-        formatTanggal(t.tanggal),
-        t.jenis === 'pemasukan' ? 'Pemasukan' : 'Pengeluaran',
-        t.kategori,
-        formatRupiah(t.nominal),
-        t.metode === 'rekening' ? 'Rekening' : 'Tunai',
-        t.keterangan || '-',
-        t.user || 'Sistem',
-    ]);
+        // Ringkasan
+        const list = lastRiwayatList;
+        const { pemasukan, pengeluaran, saldo } = kalkulasi(list);
+        const { tunai, rekening } = kalkulasiMetode(list);
 
-    doc.autoTable({
-        startY: 47,
-        head: [['No', 'Tanggal', 'Jenis', 'Kategori', 'Nominal', 'Metode', 'Keterangan', 'Dicatat Oleh']],
-        body: rows,
-        styles: { fontSize: 8, cellPadding: 2.5 },
-        headStyles: { fillColor: [45, 122, 79], textColor: 255, fontStyle: 'bold' },
-        alternateRowStyles: { fillColor: [245, 250, 247] },
-        columnStyles: {
-            0: { cellWidth: 8 },
-            1: { cellWidth: 28 },
-            2: { cellWidth: 24 },
-            3: { cellWidth: 28 },
-            4: { cellWidth: 32, halign: 'right' },
-            5: { cellWidth: 22 },
-            6: { cellWidth: 'auto' },
-            7: { cellWidth: 34 },
-        },
-        margin: { left: 14, right: 14 },
-    });
-
-    // Footer
-    const pageCount = doc.internal.getNumberOfPages();
-    for (let p = 1; p <= pageCount; p++) {
-        doc.setPage(p);
-        doc.setFontSize(8);
+        doc.setFontSize(9);
         doc.setFont('helvetica', 'normal');
-        doc.setTextColor(150);
-        doc.text(`Halaman ${p} dari ${pageCount}   •   Dicetak: ${new Date().toLocaleString('id-ID')}`, 148, doc.internal.pageSize.height - 6, { align: 'center' });
-        doc.setTextColor(0);
+        const ringkasan = [
+            ['Total Pemasukan', formatRupiah(pemasukan)],
+            ['Total Pengeluaran', formatRupiah(pengeluaran)],
+            ['Saldo Bersih', formatRupiah(saldo)],
+            ['Total Tunai', formatRupiah(Math.abs(tunai))],
+            ['Total Transfer Rekening', formatRupiah(Math.abs(rekening))],
+        ];
+        let rx = 14, ry = 35;
+        ringkasan.forEach(([label, nilai]) => {
+            doc.setFont('helvetica', 'bold');
+            doc.text(label + ':', rx, ry);
+            doc.setFont('helvetica', 'normal');
+            doc.text(nilai, rx + 52, ry);
+            rx += 55;
+        });
+
+        // Tabel transaksi
+        const rows = list.map((t, i) => [
+            i + 1,
+            formatTanggal(t.tanggal),
+            t.jenis === 'pemasukan' ? 'Pemasukan' : 'Pengeluaran',
+            t.kategori,
+            formatRupiah(t.nominal),
+            t.metode === 'rekening' ? 'Rekening' : 'Tunai',
+            t.keterangan || '-',
+            t.user || 'Sistem',
+        ]);
+
+        doc.autoTable({
+            startY: 47,
+            head: [['No', 'Tanggal', 'Jenis', 'Kategori', 'Nominal', 'Metode', 'Keterangan', 'Dicatat Oleh']],
+            body: rows,
+            styles: { fontSize: 8, cellPadding: 2.5 },
+            headStyles: { fillColor: [45, 122, 79], textColor: 255, fontStyle: 'bold' },
+            alternateRowStyles: { fillColor: [245, 250, 247] },
+            columnStyles: {
+                0: { cellWidth: 8 },
+                1: { cellWidth: 28 },
+                2: { cellWidth: 24 },
+                3: { cellWidth: 28 },
+                4: { cellWidth: 32, halign: 'right' },
+                5: { cellWidth: 22 },
+                6: { cellWidth: 'auto' },
+                7: { cellWidth: 34 },
+            },
+            margin: { left: 14, right: 14 },
+        });
+
+        // Footer
+        const pageCount = doc.internal.getNumberOfPages();
+        for (let p = 1; p <= pageCount; p++) {
+            doc.setPage(p);
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(150);
+            doc.text(`Halaman ${p} dari ${pageCount}   •   Dicetak: ${new Date().toLocaleString('id-ID')}`, 148, doc.internal.pageSize.height - 6, { align: 'center' });
+            doc.setTextColor(0);
+        }
+
+        const fileName = `Laporan_Keuangan_${periodeTeks.replace(/ /g, '_')}.pdf`;
+        doc.save(fileName);
+        showToast(`✅ PDF berhasil diunduh: ${fileName}`, 'success');
+    } catch (err) {
+        console.error(err);
+        showToast('Gagal memproses PDF! Periksa koneksi internet.', 'error');
     }
-
-    const fileName = `Laporan_Keuangan_${periodeTeks.replace(/ /g, '_')}.pdf`;
-    doc.save(fileName);
-    showToast(`✅ PDF berhasil diunduh: ${fileName}`, 'success');
 }
+
