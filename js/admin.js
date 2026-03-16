@@ -594,28 +594,30 @@ async function downloadPDF() {
         doc.setLineWidth(0.7);
         doc.line(14, 30, 283, 30);
 
-        // Ringkasan
+        // Ringkasan 2 Baris agar rapi
         const list = lastRiwayatList;
         const { pemasukan, pengeluaran, saldo } = kalkulasi(list);
         const { tunai, rekening } = kalkulasiMetode(list);
 
         doc.setFontSize(9);
-        doc.setFont('helvetica', 'normal');
-        const ringkasan = [
-            ['Total Pemasukan', formatRupiah(pemasukan)],
-            ['Total Pengeluaran', formatRupiah(pengeluaran)],
-            ['Saldo Bersih', formatRupiah(saldo)],
-            ['Total Tunai', formatRupiah(Math.abs(tunai))],
-            ['Total Transfer Rekening', formatRupiah(Math.abs(rekening))],
-        ];
-        let rx = 14, ry = 35;
-        ringkasan.forEach(([label, nilai]) => {
-            doc.setFont('helvetica', 'bold');
-            doc.text(label + ':', rx, ry);
-            doc.setFont('helvetica', 'normal');
-            doc.text(nilai, rx + 52, ry);
-            rx += 55;
-        });
+        
+        // Baris 1 & 2 - Kolom 1
+        doc.setFont('helvetica', 'bold'); doc.text('Total Pemasukan:', 14, 35);
+        doc.setFont('helvetica', 'normal'); doc.text(formatRupiah(pemasukan), 48, 35);
+        
+        doc.setFont('helvetica', 'bold'); doc.text('Total Tunai:', 14, 41);
+        doc.setFont('helvetica', 'normal'); doc.text(formatRupiah(Math.abs(tunai)), 48, 41);
+        
+        // Baris 1 & 2 - Kolom 2
+        doc.setFont('helvetica', 'bold'); doc.text('Total Pengeluaran:', 100, 35);
+        doc.setFont('helvetica', 'normal'); doc.text(formatRupiah(pengeluaran), 140, 35);
+        
+        doc.setFont('helvetica', 'bold'); doc.text('Total Transfer Rekening:', 100, 41);
+        doc.setFont('helvetica', 'normal'); doc.text(formatRupiah(Math.abs(rekening)), 140, 41);
+
+        // Baris 1 - Kolom 3
+        doc.setFont('helvetica', 'bold'); doc.text('Saldo Bersih:', 200, 35);
+        doc.setFont('helvetica', 'normal'); doc.text(formatRupiah(saldo), 225, 35);
 
         // Tabel transaksi
         const rows = list.map((t, i) => [
