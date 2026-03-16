@@ -32,6 +32,30 @@ async function renderPubInfo() {
     const info = await getInfo();
     document.getElementById('pub-nama').textContent = info.nama || 'Masjid Al-Ikhlas Adi Sucipto';
     document.getElementById('pub-alamat').textContent = info.alamat || '';
+    const waNomor = document.getElementById('wa-nomor');
+    if (waNomor) waNomor.textContent = info.kontak || '';
+}
+
+// ─── Konfirmasi ke Takmir via WhatsApp ────────────────────────────────────
+function bukaKonfirmasiWA() {
+    const nomorEl = document.getElementById('wa-nomor');
+    let nomor = nomorEl ? nomorEl.textContent.trim() : '';
+
+    if (!nomor) {
+        alert('Nomor WhatsApp pengurus belum dikonfigurasi.\nSilakan hubungi Admin untuk mengisi nomor kontak di menu Pengaturan.');
+        return;
+    }
+
+    nomor = nomor.replace(/[\s\-\(\)]/g, '');
+    if (nomor.startsWith('0')) nomor = '62' + nomor.slice(1);
+    if (nomor.startsWith('+')) nomor = nomor.slice(1);
+
+    const namaMasjid = document.getElementById('pub-nama').textContent || 'Masjid Al-Ikhlas';
+    const pesan = encodeURIComponent(
+        'Assalamualaikum warahmatullahi wabarakatuh.\n\nSaya ingin mengkonfirmasi bukti transfer donasi/infaq ke ' + namaMasjid + '.\n\n[Silakan lampirkan bukti transfer Anda]\n\nJazakumullahu khairan.'
+    );
+
+    window.open('https://wa.me/' + nomor + '?text=' + pesan, '_blank');
 }
 
 // ─── Filter ───────────────────────────────────────────────────────────────
