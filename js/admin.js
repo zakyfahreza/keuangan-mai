@@ -106,10 +106,10 @@ function closeSidebar() {
 }
 
 // ─── Filter Periode ────────────────────────────────────────────────────────
-function initFilter() {
+async function initFilter() {
     const sel = document.getElementById('filter-tahun-riwayat');
     const selD = document.getElementById('filter-tahun-dash');
-    const tahunList = getPeriodeOptions();
+    const tahunList = await getPeriodeOptions();
     [sel, selD].forEach(s => {
         if (!s) return;
         s.innerHTML = '';
@@ -148,16 +148,16 @@ async function renderDashboard() {
     const recent = list.slice(0, 5);
     if (recent.length === 0) {
         tbl.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="es-icon">📋</div><p>Belum ada transaksi periode ini</p></div></td></tr>`;
-        return;
+    } else {
+        tbl.innerHTML = recent.map(t => `
+        <tr>
+          <td>${formatTanggal(t.tanggal)}</td>
+          <td><span class="badge badge-${t.jenis}">${t.jenis === 'pemasukan' ? '⬆ Pemasukan' : '⬇ Pengeluaran'}</span></td>
+          <td>${t.kategori}</td>
+          <td>${t.keterangan || '-'}<br><small style="color:var(--abu-4); display:block; margin-top:4px;">👤 ${t.user || 'Sistem'}</small></td>
+        </tr>
+      `).join('');
     }
-    tbl.innerHTML = recent.map(t => `
-    <tr>
-      <td>${formatTanggal(t.tanggal)}</td>
-      <td><span class="badge badge-${t.jenis}">${t.jenis === 'pemasukan' ? '⬆ Pemasukan' : '⬇ Pengeluaran'}</span></td>
-      <td>${t.kategori}</td>
-      <td>${t.keterangan || '-'}<br><small style="color:var(--abu-4); display:block; margin-top:4px;">👤 ${t.user || 'Sistem'}</small></td>
-    </tr>
-  `).join('');
 
     await renderChart(parseInt(tahun));
 }
