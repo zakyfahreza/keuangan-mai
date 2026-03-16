@@ -12,12 +12,15 @@ let filterTahun = new Date().getFullYear();
 let listenerRegistered = false;
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // Auto-fill username/akses if previously remembered
-    const savedUser = localStorage.getItem('masjid_remember_username');
-    if (savedUser) {
+    // Auto-fill saved credentials if Remember Me was previously checked
+    const savedUsername = localStorage.getItem('masjid_saved_username');
+    const savedPassword = localStorage.getItem('masjid_saved_password');
+    if (savedUsername && savedPassword) {
         const sel = document.getElementById('user-input');
-        if (sel) sel.value = savedUser;
+        const passInput = document.getElementById('pass-input');
         const cb = document.getElementById('remember-me');
+        if (sel) sel.value = savedUsername;
+        if (passInput) passInput.value = savedPassword;
         if (cb) cb.checked = true;
     }
 
@@ -69,7 +72,16 @@ function doLogin() {
     const username = document.getElementById('user-input').value;
     const pass = document.getElementById('pass-input').value;
     const remember = document.getElementById('remember-me').checked;
-    if (login(username, pass, remember)) {
+
+    if (login(username, pass)) {
+        // Save or clear credentials based on checkbox
+        if (remember) {
+            localStorage.setItem('masjid_saved_username', username);
+            localStorage.setItem('masjid_saved_password', pass);
+        } else {
+            localStorage.removeItem('masjid_saved_username');
+            localStorage.removeItem('masjid_saved_password');
+        }
         showApp();
     } else {
         const err = document.getElementById('login-err');
@@ -82,6 +94,9 @@ function doLogin() {
 
 function doLogout() {
     logout();
+    // Clear stored credentials on logout
+    localStorage.removeItem('masjid_saved_username');
+    localStorage.removeItem('masjid_saved_password');
     showLogin();
     document.getElementById('pass-input').value = '';
     document.getElementById('login-err').style.display = 'none';
